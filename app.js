@@ -163,17 +163,35 @@ function showResult() {
 }
 
 // Активация приза
-function activatePrize() {
-    // Формат: {user_id, prize: {id, name}}
+async function activatePrize() {
     const data = {
-        user_id: userData.id,
+        user: {
+            id: userData.id,
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            username: userData.username,
+            language_code: userData.languageCode
+        },
         prize: {
             id: currentPrize.id,
-            name: currentPrize.name
-        }
+            name: currentPrize.name,
+            description: currentPrize.description
+        },
+        timestamp: new Date().toISOString()
     };
 
     console.log('Sending data:', data);
+
+    // Отправляем на webhook
+    try {
+        await fetch('https://testn8n.easydrafting.ru/webhook/fortuna_mother', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (e) {
+        console.error('Webhook error:', e);
+    }
 
     // Сохраняем что пользователь уже крутил
     localStorage.setItem('wheel_played_' + userData.id, 'true');
