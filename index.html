@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Новогоднее Колесо Удачи</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Новогоднее Колесо Удачи</h1>
+            <p class="subtitle">Испытай удачу и получи подарок от Cryo Cliniq!</p>
+        </div>
+
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- Секторы будут добавлены через JS -->
+            </div>
+            <button class="spin-button" id="spinBtn">
+                <span>КРУТИТЬ</span>
+            </button>
+        </div>
+
+        <div class="result-modal" id="resultModal">
+            <div class="modal-content">
+                <div class="confetti"></div>
+                <h2>Поздравляем!</h2>
+                <p class="prize-text" id="prizeText"></p>
+                <button class="activate-btn" id="activateBtn">Активировать подарок</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

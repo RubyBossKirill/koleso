@@ -1,0 +1,215 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.header h1 {
+    color: #ffd700;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.subtitle {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.wheel-container {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 8px #ffd700,
+        0 0 0 12px #1a1a2e,
+        0 0 30px rgba(255, 215, 0, 0.4);
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+.wheel-label {
+    z-index: 2;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 35px solid #ffd700;
+    z-index: 10;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+}
+
+.spin-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #ffd700, #ffaa00);
+    border: 4px solid #fff;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 5px 20px rgba(255, 170, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.spin-button:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 170, 0, 0.7);
+}
+
+.spin-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+.spin-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spin-button span {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #1a1a2e;
+    text-transform: uppercase;
+}
+
+/* Результат */
+.result-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: fadeIn 0.3s ease;
+}
+
+.result-modal.show {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #1e3a5f, #16213e);
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 350px;
+    margin: 20px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+    animation: popIn 0.4s ease;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h2 {
+    color: #ffd700;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.prize-text {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.activate-btn {
+    background: linear-gradient(145deg, #ffd700, #ffaa00);
+    color: #1a1a2e;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(255, 170, 0, 0.4);
+}
+
+.activate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 170, 0, 0.6);
+}
+
+/* Конфетти эффект */
+.confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+/* Адаптив */
+@media (max-width: 360px) {
+    .wheel-container {
+        width: 280px;
+        height: 280px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .spin-button {
+        width: 70px;
+        height: 70px;
+    }
+
+    .spin-button span {
+        font-size: 0.75rem;
+    }
+}
