@@ -152,6 +152,12 @@ function spinWheel() {
     const prizeIndex = Math.floor(Math.random() * prizes.length);
     currentPrize = prizes[prizeIndex];
 
+    // Сохраняем приз в localStorage (не активирован)
+    localStorage.setItem('pending_prize_' + userData.id, JSON.stringify({
+        prize: currentPrize,
+        timestamp: new Date().toISOString()
+    }));
+
     // Вычисляем угол для остановки на выбранном призе
     const sectorAngle = 360 / prizes.length;
     const prizeAngle = sectorAngle * prizeIndex;
@@ -213,7 +219,10 @@ async function activatePrize() {
         console.error('Webhook error:', e);
     }
 
-    // Сохраняем что пользователь уже крутил
+    // Удаляем неактивированный приз
+    localStorage.removeItem('pending_prize_' + userData.id);
+
+    // Сохраняем что пользователь уже крутил и активировал
     localStorage.setItem('wheel_played_' + userData.id, 'true');
 
     if (tg) {
@@ -229,6 +238,35 @@ async function activatePrize() {
 
 // Проверка, играл ли пользователь
 function checkIfAlreadyPlayed() {
+    // Сначала проверяем, есть ли неактивированный приз
+    const pendingPrizeData = localStorage.getItem('pending_prize_' + userData.id);
+
+    if (pendingPrizeData) {
+        try {
+            const data = JSON.parse(pendingPrizeData);
+            currentPrize = data.prize;
+
+            const spinBtn = document.getElementById('spinBtn');
+            spinBtn.disabled = true;
+            spinBtn.innerHTML = '<span>УЖЕ</span>';
+
+            // Показываем неактивированный приз
+            const modal = document.getElementById('resultModal');
+            const prizeText = document.getElementById('prizeText');
+            const activateBtn = document.getElementById('activateBtn');
+
+            prizeText.innerHTML = `У тебя есть неактивированный подарок:<br><strong>${currentPrize.description}</strong>`;
+            activateBtn.textContent = 'Активировать подарок';
+            activateBtn.onclick = activatePrize;
+            modal.classList.add('show');
+
+            return;
+        } catch (e) {
+            console.error('Error parsing pending prize:', e);
+        }
+    }
+
+    // Затем проверяем, активирован ли уже приз
     const played = localStorage.getItem('wheel_played_' + userData.id);
     if (played) {
         const spinBtn = document.getElementById('spinBtn');
