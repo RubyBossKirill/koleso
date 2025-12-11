@@ -297,7 +297,7 @@ body::before {
 
 .modal-content {
     background: #AAAAAA;
-    padding: 40px 30px;
+    padding: 25px 30px 35px;
     border-radius: 0;
     text-align: center;
     max-width: 350px;
@@ -330,25 +330,22 @@ body::before {
 }
 
 .modal-content h2 {
-    color: transparent;
-    background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+    color: #AC802E;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
     font-weight: 400;
     position: relative;
     z-index: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content h2::before {
     content: '🎁';
     display: block;
-    font-size: 3rem;
-    margin-bottom: 15px;
+    font-size: 2.2rem;
+    margin-bottom: 8px;
     animation: bounce 1s ease-in-out infinite;
 }
 
@@ -358,13 +355,14 @@ body::before {
 }
 
 .prize-text {
-    color: #000000;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    line-height: 1.6;
-    letter-spacing: 0.5px;
+    color: #1a1a1a;
+    font-size: 1rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
     position: relative;
     z-index: 1;
+    font-weight: 400;
 }
 
 .activate-btn {
@@ -462,21 +460,22 @@ body::before {
 
     .modal-content {
         max-width: 320px;
-        padding: 35px 25px;
+        padding: 20px 25px 30px;
     }
 
     .modal-content h2 {
-        font-size: 1.5rem;
-        letter-spacing: 2px;
+        font-size: 1.3rem;
+        letter-spacing: 1.2px;
     }
 
     .modal-content h2::before {
-        font-size: 2.5rem;
-        margin-bottom: 12px;
+        font-size: 2rem;
+        margin-bottom: 6px;
     }
 
     .prize-text {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
     }
 
     .activate-btn {
