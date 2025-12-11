@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,13 +7,48 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Tenor Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    padding: 10px 0;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(172, 128, 46, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(144, 72, 42, 0.2) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Новогодние снежинки */
+.snowflake {
+    position: fixed;
+    top: -10px;
+    color: rgba(252, 242, 174, 0.8);
+    font-size: 1.2rem;
+    z-index: 1000;
+    pointer-events: none;
+    animation: fall linear infinite;
+    text-shadow: 0 0 5px rgba(172, 128, 46, 0.5);
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
 }
 
 .container {
@@ -19,19 +56,71 @@ body {
     padding: 20px;
     width: 100%;
     max-width: 400px;
+    position: relative;
+    z-index: 1;
 }
 
 .header h1 {
-    color: #ffd700;
-    font-size: 1.8rem;
+    color: transparent;
+    background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.6rem;
     margin-bottom: 8px;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 400;
+    position: relative;
+}
+
+.header h1::before {
+    content: '❄';
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #FCF2AE;
+    opacity: 0.7;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.header h1::after {
+    content: '❄';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #FCF2AE;
+    opacity: 0.7;
+    animation: sparkle 2s ease-in-out infinite 1s;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
 }
 
 .subtitle {
-    color: #e0e0e0;
-    font-size: 0.95rem;
-    margin-bottom: 30px;
+    color: #b2b2b2;
+    font-size: 0.85rem;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+.subtitle::after {
+    content: '🎄 С Новым Годом! 🎄';
+    display: block;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1.5px;
+    font-weight: 400;
 }
 
 .wheel-container {
@@ -39,6 +128,7 @@ body {
     width: 320px;
     height: 320px;
     margin: 0 auto;
+    margin-top: 20px;
 }
 
 .wheel {
@@ -48,9 +138,10 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow:
-        0 0 0 8px #ffd700,
-        0 0 0 12px #1a1a2e,
-        0 0 30px rgba(255, 215, 0, 0.4);
+        0 0 0 3px #90482A,
+        0 0 0 6px #AC802E,
+        0 0 40px rgba(172, 128, 46, 0.5),
+        inset 0 0 50px rgba(0, 0, 0, 0.3);
     transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
 }
 
@@ -60,16 +151,28 @@ body {
 
 .wheel-pointer {
     position: absolute;
-    top: -15px;
+    top: -20px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 35px solid #ffd700;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-top: 40px solid #AC802E;
     z-index: 10;
-    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+.wheel-pointer::after {
+    content: '';
+    position: absolute;
+    top: -38px;
+    left: -18px;
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 35px solid #FCF2AE;
 }
 
 .spin-button {
@@ -77,20 +180,44 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background: linear-gradient(145deg, #ffd700, #ffaa00);
-    border: 4px solid #fff;
+    background: linear-gradient(145deg, #AC802E, #FCF2AE, #AC802E);
+    border: none;
     cursor: pointer;
-    z-index: 5;
-    box-shadow: 0 5px 20px rgba(255, 170, 0, 0.5);
+    z-index: 6;
+    box-shadow:
+        0 0 0 3px #90482A,
+        0 8px 30px rgba(172, 128, 46, 0.6),
+        inset 0 2px 10px rgba(252, 242, 174, 0.5);
     transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.spin-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(252, 242, 174, 0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 }
 
 .spin-button:hover {
     transform: translate(-50%, -50%) scale(1.05);
-    box-shadow: 0 8px 25px rgba(255, 170, 0, 0.7);
+    box-shadow:
+        0 0 0 3px #90482A,
+        0 12px 40px rgba(172, 128, 46, 0.8),
+        inset 0 2px 10px rgba(252, 242, 174, 0.7);
 }
 
 .spin-button:active {
@@ -98,15 +225,37 @@ body {
 }
 
 .spin-button:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
 .spin-button span {
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #1a1a2e;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #000000;
     text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.center-decoration {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 4;
+}
+
+.center-decoration svg {
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Результат */
@@ -134,15 +283,32 @@ body {
 }
 
 .modal-content {
-    background: linear-gradient(145deg, #1e3a5f, #16213e);
+    background: #AAAAAA;
     padding: 40px 30px;
-    border-radius: 20px;
+    border-radius: 0;
     text-align: center;
     max-width: 350px;
     margin: 20px;
-    border: 3px solid #ffd700;
-    box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+    border: 3px solid #90482A;
+    box-shadow:
+        0 0 0 1px #AC802E,
+        0 20px 60px rgba(172, 128, 46, 0.4);
     animation: popIn 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 30% 40%, rgba(172, 128, 46, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(144, 72, 42, 0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 @keyframes popIn {
@@ -151,34 +317,63 @@ body {
 }
 
 .modal-content h2 {
-    color: #ffd700;
-    font-size: 2rem;
+    color: transparent;
+    background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.8rem;
     margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-content h2::before {
+    content: '🎁';
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .prize-text {
-    color: #fff;
-    font-size: 1.2rem;
+    color: #000000;
+    font-size: 1.1rem;
     margin-bottom: 30px;
-    line-height: 1.5;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
 }
 
 .activate-btn {
-    background: linear-gradient(145deg, #ffd700, #ffaa00);
-    color: #1a1a2e;
-    border: none;
+    background: linear-gradient(145deg, #AC802E, #FCF2AE, #AC802E);
+    color: #000000;
+    border: 2px solid #90482A;
     padding: 15px 40px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(255, 170, 0, 0.4);
+    box-shadow: 0 6px 25px rgba(172, 128, 46, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .activate-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 170, 0, 0.6);
+    box-shadow: 0 10px 35px rgba(172, 128, 46, 0.7);
 }
 
 /* Конфетти эффект */
@@ -193,7 +388,104 @@ body {
 }
 
 
-/* Адаптив */
+/* Фирменный паттерн */
+.container::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 150px;
+    background-image: url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2390482A' stroke-width='0.8' opacity='0.3'%3E%3Cpath d='M75 20 Q60 40, 75 60 Q90 40, 75 20 Z' /%3E%3Cpath d='M75 30 Q65 45, 75 60 Q85 45, 75 30 Z' /%3E%3Cpath d='M75 40 Q70 50, 75 60 Q80 50, 75 40 Z' /%3E%3Cpath d='M50 60 Q40 75, 50 90 Q60 75, 50 60 Z' /%3E%3Cpath d='M100 60 Q90 75, 100 90 Q110 75, 100 60 Z' /%3E%3Cpath d='M75 80 Q65 95, 75 110 Q85 95, 75 80 Z' /%3E%3C/g%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: -1;
+}
+
+/* Адаптив для Telegram WebApp */
+@media (max-width: 420px) {
+    .header h1 {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+    .header h1::before,
+    .header h1::after {
+        font-size: 1rem;
+        left: -25px;
+    }
+
+    .header h1::after {
+        right: -25px;
+        left: auto;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+    }
+
+    .subtitle::after {
+        font-size: 0.75rem;
+        margin-top: 8px;
+    }
+
+    .wheel-container {
+        width: 300px;
+        height: 300px;
+        margin-top: 15px;
+    }
+
+    .spin-button {
+        width: 80px;
+        height: 80px;
+    }
+
+    .spin-button span {
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+    }
+
+    .center-decoration svg {
+        width: 90px;
+        height: 90px;
+    }
+
+    .container::before {
+        width: 120px;
+        height: 120px;
+        top: -40px;
+    }
+
+    .modal-content {
+        max-width: 320px;
+        padding: 35px 25px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+    }
+
+    .modal-content h2::before {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+
+    .prize-text {
+        font-size: 1rem;
+    }
+
+    .activate-btn {
+        padding: 12px 35px;
+        font-size: 0.9rem;
+    }
+}
+
 @media (max-width: 360px) {
     .wheel-container {
         width: 280px;
@@ -201,15 +493,21 @@ body {
     }
 
     .header h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+    }
+
+    .header h1::before,
+    .header h1::after {
+        display: none;
     }
 
     .spin-button {
-        width: 70px;
-        height: 70px;
+        width: 75px;
+        height: 75px;
     }
 
-    .spin-button span {
-        font-size: 0.75rem;
+    .center-decoration svg {
+        width: 80px;
+        height: 80px;
     }
 }

@@ -1,13 +1,13 @@
-// Призы для колеса
+// Призы для колеса - цвета по брендбуку ALTAY RESTART
 const prizes = [
-    { id: 1, name: "Скидка 20%", description: "Скидка 20% на любой сеанс криотерапии", color: "#ff6b6b" },
-    { id: 2, name: "Аффирмация", description: "Персональная новогодняя аффирмация для успеха", color: "#4ecdc4" },
-    { id: 3, name: "Мини-диагностика", description: "Бесплатная мини-диагностика организма", color: "#ffe66d" },
-    { id: 4, name: "Скидка 15%", description: "Скидка 15% на программу восстановления", color: "#95e1d3" },
-    { id: 5, name: "Криосеанс", description: "Бесплатный пробный криосеанс", color: "#f38181" },
-    { id: 6, name: "Скидка 10%", description: "Скидка 10% на любую услугу", color: "#aa96da" },
-    { id: 7, name: "Программа", description: "Мини-программа восстановления на 3 дня", color: "#fcbad3" },
-    { id: 8, name: "Консультация", description: "Бесплатная консультация специалиста", color: "#a8d8ea" }
+    { id: 1, name: "Скидка 20%", description: "Скидка 20% на любой сеанс криотерапии", color: "#90482A" },
+    { id: 2, name: "Аффирмация", description: "Персональная новогодняя аффирмация для успеха", color: "#b2b2b2" },
+    { id: 3, name: "Мини-диагностика", description: "Бесплатная мини-диагностика организма", color: "#AC802E" },
+    { id: 4, name: "Скидка 15%", description: "Скидка 15% на программу восстановления", color: "#AAAAAA" },
+    { id: 5, name: "Криосеанс", description: "Бесплатный пробный криосеанс", color: "#F5A785" },
+    { id: 6, name: "Скидка 10%", description: "Скидка 10% на любую услугу", color: "#FCF2AE" },
+    { id: 7, name: "Программа", description: "Мини-программа восстановления на 3 дня", color: "#EC6639" },
+    { id: 8, name: "Консультация", description: "Бесплатная консультация специалиста", color: "#A83717" }
 ];
 
 // Инициализация Telegram WebApp
@@ -20,7 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
     createWheel();
     setupEventListeners();
     checkIfAlreadyPlayed();
+    createSnowflakes();
 });
+
+// Создание новогодних снежинок
+function createSnowflakes() {
+    const snowflakeCount = 15;
+    const snowflakes = ['❄', '❅', '❆'];
+
+    for (let i = 0; i < snowflakeCount; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        snowflake.style.animationDelay = Math.random() * 5 + 's';
+        snowflake.style.fontSize = (Math.random() * 0.5 + 0.8) + 'rem';
+        snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+        document.body.appendChild(snowflake);
+    }
+}
 
 // Инициализация Telegram
 function initTelegram() {
@@ -91,14 +110,15 @@ function createWheel() {
             left: ${x}%;
             top: ${y}%;
             transform: translate(-50%, -50%) rotate(${angle}deg);
-            font-size: 0.6rem;
-            font-weight: bold;
-            color: #1a1a2e;
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: ${prize.color === '#b2b2b2' || prize.color === '#AAAAAA' || prize.color === '#FCF2AE' || prize.color === '#F5A785' ? '#000000' : '#FFFFFF'};
             text-align: center;
-            width: 70px;
-            line-height: 1.1;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+            width: 75px;
+            line-height: 1.2;
+            text-shadow: ${prize.color === '#b2b2b2' || prize.color === '#AAAAAA' || prize.color === '#FCF2AE' || prize.color === '#F5A785' ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(255,255,255,0.3)'};
             pointer-events: none;
+            letter-spacing: 0.5px;
         `;
         label.textContent = prize.name;
 
@@ -230,10 +250,10 @@ function checkIfAlreadyPlayed() {
     }
 }
 
-// Создание конфетти
+// Создание конфетти с цветами брендбука
 function createConfetti() {
     const confettiContainer = document.querySelector('.confetti');
-    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ffe66d', '#aa96da'];
+    const colors = ['#AC802E', '#FCF2AE', '#90482A', '#F5A785', '#EC6639'];
 
     for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
