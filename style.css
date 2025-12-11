@@ -60,6 +60,17 @@ body::before {
     z-index: 1;
 }
 
+.logo-container {
+    margin-top: 30px;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 8px rgba(172, 128, 46, 0.3));
+}
+
 .header h1 {
     color: transparent;
     background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
@@ -390,26 +401,18 @@ body::before {
 }
 
 
-/* Фирменный паттерн */
-.container::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 150px;
-    height: 150px;
-    background-image: url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2390482A' stroke-width='0.8' opacity='0.3'%3E%3Cpath d='M75 20 Q60 40, 75 60 Q90 40, 75 20 Z' /%3E%3Cpath d='M75 30 Q65 45, 75 60 Q85 45, 75 30 Z' /%3E%3Cpath d='M75 40 Q70 50, 75 60 Q80 50, 75 40 Z' /%3E%3Cpath d='M50 60 Q40 75, 50 90 Q60 75, 50 60 Z' /%3E%3Cpath d='M100 60 Q90 75, 100 90 Q110 75, 100 60 Z' /%3E%3Cpath d='M75 80 Q65 95, 75 110 Q85 95, 75 80 Z' /%3E%3C/g%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    pointer-events: none;
-    opacity: 0.4;
-    z-index: -1;
-}
 
 /* Адаптив для Telegram WebApp */
 @media (max-width: 420px) {
+    .logo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .logo-container {
+        margin-top: 25px;
+    }
+
     .header h1 {
         font-size: 1.4rem;
         letter-spacing: 2px;
@@ -457,12 +460,6 @@ body::before {
         height: 90px;
     }
 
-    .container::before {
-        width: 120px;
-        height: 120px;
-        top: -40px;
-    }
-
     .modal-content {
         max-width: 320px;
         padding: 35px 25px;
@@ -489,6 +486,15 @@ body::before {
 }
 
 @media (max-width: 360px) {
+    .logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .logo-container {
+        margin-top: 20px;
+    }
+
     .wheel-container {
         width: 280px;
         height: 280px;
