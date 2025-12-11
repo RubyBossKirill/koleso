@@ -53,7 +53,7 @@ body::before {
 
 .container {
     text-align: center;
-    padding: 30px 20px 20px;
+    padding: 40px 20px 20px;
     width: 100%;
     max-width: 400px;
     position: relative;
@@ -67,8 +67,8 @@ body::before {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-size: 1.6rem;
-    margin-bottom: 10px;
-    margin-top: 10px;
+    margin-bottom: 15px;
+    margin-top: 0;
     text-transform: uppercase;
     letter-spacing: 3px;
     font-weight: 400;
@@ -107,14 +107,14 @@ body::before {
 .subtitle {
     color: #b2b2b2;
     font-size: 0.85rem;
-    margin-bottom: 25px;
+    margin-bottom: 35px;
     letter-spacing: 1px;
 }
 
 .subtitle::after {
     content: '🎄 С Новым Годом! 🎄';
     display: block;
-    margin-top: 10px;
+    margin-top: 15px;
     font-size: 0.9rem;
     background: linear-gradient(135deg, #AC802E 0%, #FCF2AE 50%, #AC802E 100%);
     -webkit-background-clip: text;
@@ -129,7 +129,7 @@ body::before {
     width: 320px;
     height: 320px;
     margin: 0 auto;
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .wheel {
