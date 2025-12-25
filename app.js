@@ -188,8 +188,8 @@ async function spinWheel() {
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
 
-            // Эмпирическая коррекция: +270° (180° + 90°)
-            const targetAngle = -sectorCenter + 270;
+            // Коррекция в обратную сторону: -90°
+            const targetAngle = -sectorCenter - 90;
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
