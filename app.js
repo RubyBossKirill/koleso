@@ -185,10 +185,13 @@ async function spinWheel() {
             console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
             // Расчёт угла
+            // Секторы начинаются с 0° (верх) по часовой стрелке
+            // Стрелка указывает на 0° (верх)
+            // Чтобы центр нужного сектора оказался под стрелкой,
+            // нужно повернуть колесо на угол = -(центр сектора)
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            // Коррекция +90° для основного приложения (эмпирически подобрано)
-            const targetAngle = -sectorCenter + 90;
+            const targetAngle = -sectorCenter;
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
