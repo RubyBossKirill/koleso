@@ -185,16 +185,17 @@ async function spinWheel() {
             console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
             // Вычисляем угол для остановки на выбранном призе
-            // conic-gradient(from 0deg) начинается сверху и идёт по часовой стрелке
-            // Стрелка указывает вверх
+            // conic-gradient(from 0deg) начинается СПРАВА (3 часа) и идёт по часовой стрелке
+            // Стрелка указывает ВВЕРХ (это 270° в системе conic-gradient)
             const sectorAngle = 360 / prizes.length; // 90° на сектор
 
-            // Центр нужного сектора
+            // Центр нужного сектора (в градусах от начала conic-gradient)
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
 
-            // Чтобы сектор оказался под стрелкой (вверху), нужно повернуть колесо
-            // на угол = -(sectorCenter) или 360 - sectorCenter
-            const targetAngle = 360 - sectorCenter;
+            // Стрелка на 270° (вверху). Нужно повернуть колесо так, чтобы
+            // центр сектора оказался на 270°
+            // Поворот = 270 - sectorCenter (чтобы sectorCenter стал на 270°)
+            const targetAngle = 270 - sectorCenter;
 
             // Добавляем несколько полных оборотов
             const spins = 5 + Math.random() * 3; // 5-8 полных оборотов
