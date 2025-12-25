@@ -185,20 +185,19 @@ async function spinWheel() {
             console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
             // Расчёт угла
-            // conic-gradient(from 0deg) начинается сверху и идёт по часовой
-            // Стрелка указывает вверх (на 0°)
-            // Сектор N занимает: N*90° до (N+1)*90°, центр на N*90° + 45°
-            // Чтобы центр сектора оказался на 0°, нужно rotate(-sectorCenter)
-            // Но стрелка "смотрит" на границу секторов, добавляем +45° чтобы попасть в центр
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-
-            // Формула: поворачиваем так, чтобы sectorCenter оказался вверху
             const targetAngle = -sectorCenter;
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
             console.log('Prize index:', prizeIndex, 'Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
+
+            // Сбрасываем колесо в начальное положение перед вращением
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
+            wheel.offsetHeight; // force reflow
+            wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
 
             wheel.style.transform = `rotate(${finalAngle}deg)`;
 
