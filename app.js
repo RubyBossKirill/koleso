@@ -1,14 +1,14 @@
 // Призы для колеса - цвета по брендбуку ALTAY RESTART
+// Теперь только 4 приза согласно лимитам
 const prizes = [
-    { id: 1, name: "Скидка 20%", description: "Скидка 20% на любой сеанс криотерапии", color: "#90482A" },
-    { id: 2, name: "Аффирмация", description: "Персональная новогодняя аффирмация для успеха", color: "#b2b2b2" },
-    { id: 3, name: "Мини-диагностика", description: "Бесплатная мини-диагностика организма", color: "#AC802E" },
-    { id: 4, name: "Скидка 15%", description: "Скидка 15% на программу восстановления", color: "#AAAAAA" },
-    { id: 5, name: "Криосеанс", description: "Бесплатный пробный криосеанс", color: "#F5A785" },
-    { id: 6, name: "Скидка 10%", description: "Скидка 10% на любую услугу", color: "#FCF2AE" },
-    { id: 7, name: "Программа", description: "Мини-программа восстановления на 3 дня", color: "#EC6639" },
-    { id: 8, name: "Консультация", description: "Бесплатная консультация специалиста", color: "#A83717" }
+    { id: 1, name: "Скидка 20% на проживание", description: "Скидка 20% на следующее проживание от 5 суток", color: "#90482A" },
+    { id: 2, name: "Скидка 50% ресторан", description: "Скидка 50% на меню ресторана без алкоголя", color: "#AC802E" },
+    { id: 3, name: "Скидка 10% ресторан", description: "Скидка 10% на меню ресторана без алкоголя", color: "#FCF2AE" },
+    { id: 4, name: "Криосеанс", description: "Бесплатный разовый криосеанс", color: "#AAAAAA" }
 ];
+
+// URL API для получения приза
+const API_URL = 'https://n8n.altaitravel.net/webhook/8ed5a0ec-1cd3-466e-923b-91a404dfa641';
 
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTelegram();
     createWheel();
     setupEventListeners();
-    checkIfAlreadyPlayed();
+    checkUserStatus();
     createSnowflakes();
 });
 
@@ -62,16 +62,16 @@ function initTelegram() {
         // Устанавливаем цвета темы
         document.body.style.backgroundColor = tg.backgroundColor || '#1a1a2e';
     } else {
-        // Для тестирования вне Telegram
+        // Для тестирования вне Telegram - числовой ID
         userData = {
-            id: 'test_' + Date.now(),
+            id: Math.floor(Math.random() * 900000000) + 100000000,
             firstName: 'Тестовый',
             lastName: 'Пользователь',
             username: 'test_user',
             languageCode: 'ru',
             initData: null
         };
-        console.log('Running outside Telegram, test mode');
+        console.log('Running outside Telegram, test mode. User ID:', userData.id);
     }
 }
 
@@ -110,13 +110,13 @@ function createWheel() {
             left: ${x}%;
             top: ${y}%;
             transform: translate(-50%, -50%) rotate(${angle}deg);
-            font-size: 0.65rem;
-            font-weight: 400;
-            color: ${prize.color === '#b2b2b2' || prize.color === '#AAAAAA' || prize.color === '#FCF2AE' || prize.color === '#F5A785' ? '#000000' : '#FFFFFF'};
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '#000000' : '#FFFFFF'};
             text-align: center;
-            width: 75px;
+            width: 80px;
             line-height: 1.2;
-            text-shadow: ${prize.color === '#b2b2b2' || prize.color === '#AAAAAA' || prize.color === '#FCF2AE' || prize.color === '#F5A785' ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(255,255,255,0.3)'};
+            text-shadow: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.5)'};
             pointer-events: none;
             letter-spacing: 0.5px;
         `;
@@ -129,17 +129,14 @@ function createWheel() {
 // Настройка обработчиков событий
 function setupEventListeners() {
     const spinBtn = document.getElementById('spinBtn');
-    const activateBtn = document.getElementById('activateBtn');
-
     spinBtn.addEventListener('click', spinWheel);
-    activateBtn.addEventListener('click', activatePrize);
 }
 
 // Вращение колеса
 let isSpinning = false;
 let currentPrize = null;
 
-function spinWheel() {
+async function spinWheel() {
     if (isSpinning) return;
 
     isSpinning = true;
@@ -147,145 +144,147 @@ function spinWheel() {
     const wheel = document.getElementById('wheel');
 
     spinBtn.disabled = true;
+    spinBtn.innerHTML = '<span>...</span>';
 
-    // Случайный выбор приза
-    const prizeIndex = Math.floor(Math.random() * prizes.length);
-    currentPrize = prizes[prizeIndex];
+    try {
+        // Запрашиваем приз с сервера
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: userData.id,
+                username: userData.username || '',
+                firstName: userData.firstName || '',
+                lastName: userData.lastName || ''
+            })
+        });
 
-    // Сохраняем приз в localStorage (не активирован)
-    localStorage.setItem('pending_prize_' + userData.id, JSON.stringify({
-        prize: currentPrize,
-        timestamp: new Date().toISOString()
-    }));
+        const result = await response.json();
+        console.log('Server response:', result);
 
-    // Вычисляем угол для остановки на выбранном призе
-    const sectorAngle = 360 / prizes.length;
-    const prizeAngle = sectorAngle * prizeIndex;
+        if (result.status === 'already_played') {
+            // Пользователь уже играл
+            isSpinning = false;
+            showAlreadyPlayed(result.prize);
+            return;
+        }
 
-    // Добавляем несколько полных оборотов + угол до приза
-    // Стрелка сверху, поэтому корректируем угол
-    const spins = 5 + Math.random() * 3; // 5-8 полных оборотов
-    const finalAngle = spins * 360 + (360 - prizeAngle - sectorAngle / 2);
+        if (result.status === 'no_prizes_left') {
+            // Призы закончились
+            isSpinning = false;
+            showNoPrizes();
+            return;
+        }
 
-    wheel.style.transform = `rotate(${finalAngle}deg)`;
+        if (result.success && result.prize) {
+            // Получили приз - крутим колесо
+            currentPrize = result.prize;
 
-    // Показываем результат после остановки
-    setTimeout(() => {
-        showResult();
+            // Находим индекс приза в массиве
+            const prizeIndex = prizes.findIndex(p => p.id === currentPrize.id);
+
+            // Вычисляем угол для остановки на выбранном призе
+            const sectorAngle = 360 / prizes.length;
+            const prizeAngle = sectorAngle * prizeIndex;
+
+            // Добавляем несколько полных оборотов + угол до приза
+            const spins = 5 + Math.random() * 3; // 5-8 полных оборотов
+            const finalAngle = spins * 360 + (360 - prizeAngle - sectorAngle / 2);
+
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+            // Показываем результат после остановки
+            setTimeout(() => {
+                showResult();
+                isSpinning = false;
+            }, 4200);
+        } else {
+            // Ошибка
+            throw new Error(result.message || 'Неизвестная ошибка');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
         isSpinning = false;
-    }, 4200);
+        spinBtn.disabled = false;
+        spinBtn.innerHTML = '<span>КРУТИТЬ</span>';
+        alert('Произошла ошибка. Попробуйте ещё раз.');
+    }
 }
 
 // Показ результата
 function showResult() {
     const modal = document.getElementById('resultModal');
     const prizeText = document.getElementById('prizeText');
+    const activateBtn = document.getElementById('activateBtn');
 
     prizeText.innerHTML = `Ты выиграл:<br><strong>${currentPrize.description}</strong>`;
+    activateBtn.textContent = 'Забрать подарок';
+    activateBtn.onclick = closePrize;
     modal.classList.add('show');
 
     // Создаем конфетти
     createConfetti();
 }
 
-// Активация приза
-async function activatePrize() {
-    const data = {
-        user: {
-            id: userData.id,
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            username: userData.username,
-            language_code: userData.languageCode
-        },
-        prize: {
-            id: currentPrize.id,
-            name: currentPrize.name,
-            description: currentPrize.description
-        },
-        timestamp: new Date().toISOString()
-    };
+// Показ сообщения "уже играл"
+function showAlreadyPlayed(prize) {
+    const spinBtn = document.getElementById('spinBtn');
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '<span>УЖЕ</span>';
 
-    console.log('Sending data:', data);
+    const modal = document.getElementById('resultModal');
+    const prizeText = document.getElementById('prizeText');
+    const activateBtn = document.getElementById('activateBtn');
 
-    // Отправляем на webhook
-    try {
-        await fetch('https://testn8n.easydrafting.ru/webhook/fortuna_mother', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-    } catch (e) {
-        console.error('Webhook error:', e);
+    if (prize) {
+        prizeText.innerHTML = `Ты уже выиграл:<br><strong>${prize.description}</strong>`;
+    } else {
+        prizeText.innerHTML = 'Ты уже участвовал в розыгрыше!<br><strong>Одна попытка на пользователя</strong>';
     }
 
-    // Удаляем неактивированный приз
-    localStorage.removeItem('pending_prize_' + userData.id);
+    activateBtn.textContent = 'Закрыть';
+    activateBtn.onclick = () => {
+        if (tg) tg.close();
+        else modal.classList.remove('show');
+    };
+    modal.classList.add('show');
+}
 
-    // Сохраняем что пользователь уже крутил и активировал
-    localStorage.setItem('wheel_played_' + userData.id, 'true');
+// Показ сообщения "призы закончились"
+function showNoPrizes() {
+    const spinBtn = document.getElementById('spinBtn');
+    spinBtn.disabled = true;
+    spinBtn.innerHTML = '<span>:(</span>';
 
+    const modal = document.getElementById('resultModal');
+    const prizeText = document.getElementById('prizeText');
+    const activateBtn = document.getElementById('activateBtn');
+
+    prizeText.innerHTML = 'К сожалению, все подарки разобрали!<br><strong>Попробуй в следующий раз</strong>';
+    activateBtn.textContent = 'Закрыть';
+    activateBtn.onclick = () => {
+        if (tg) tg.close();
+        else modal.classList.remove('show');
+    };
+    modal.classList.add('show');
+}
+
+// Закрытие после получения приза
+function closePrize() {
     if (tg) {
-        // Отправляем данные боту и закрываем WebApp
-        tg.sendData(JSON.stringify(data));
         tg.close();
     } else {
-        // Для тестирования
-        console.log('Prize activated (test mode):', data);
-        alert('Подарок активирован! WebApp закроется.\n\n' + JSON.stringify(data, null, 2));
+        console.log('Prize claimed (test mode):', currentPrize);
+        alert('Подарок получен!\n\n' + currentPrize.description);
+        document.getElementById('resultModal').classList.remove('show');
     }
 }
 
-// Проверка, играл ли пользователь
-function checkIfAlreadyPlayed() {
-    // Сначала проверяем, есть ли неактивированный приз
-    const pendingPrizeData = localStorage.getItem('pending_prize_' + userData.id);
-
-    if (pendingPrizeData) {
-        try {
-            const data = JSON.parse(pendingPrizeData);
-            currentPrize = data.prize;
-
-            const spinBtn = document.getElementById('spinBtn');
-            spinBtn.disabled = true;
-            spinBtn.innerHTML = '<span>УЖЕ</span>';
-
-            // Показываем неактивированный приз
-            const modal = document.getElementById('resultModal');
-            const prizeText = document.getElementById('prizeText');
-            const activateBtn = document.getElementById('activateBtn');
-
-            prizeText.innerHTML = `У тебя есть неактивированный подарок:<br><strong>${currentPrize.description}</strong>`;
-            activateBtn.textContent = 'Активировать подарок';
-            activateBtn.onclick = activatePrize;
-            modal.classList.add('show');
-
-            return;
-        } catch (e) {
-            console.error('Error parsing pending prize:', e);
-        }
-    }
-
-    // Затем проверяем, активирован ли уже приз
-    const played = localStorage.getItem('wheel_played_' + userData.id);
-    if (played) {
-        const spinBtn = document.getElementById('spinBtn');
-        spinBtn.disabled = true;
-        spinBtn.innerHTML = '<span>УЖЕ</span>';
-
-        // Показываем сообщение
-        const modal = document.getElementById('resultModal');
-        const prizeText = document.getElementById('prizeText');
-        const activateBtn = document.getElementById('activateBtn');
-
-        prizeText.innerHTML = 'Ты уже участвовал в розыгрыше!<br><strong>Одна попытка на пользователя</strong>';
-        activateBtn.textContent = 'Закрыть';
-        activateBtn.onclick = () => {
-            if (tg) tg.close();
-            else modal.classList.remove('show');
-        };
-        modal.classList.add('show');
-    }
+// Проверка статуса пользователя при загрузке
+async function checkUserStatus() {
+    // Проверка происходит при попытке крутить - сервер сам проверит
+    // Здесь можно добавить предварительную проверку если нужно
 }
 
 // Создание конфетти с цветами брендбука
