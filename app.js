@@ -76,13 +76,18 @@ function initTelegram() {
 }
 
 // Создание секторов колеса
+// ВАЖНО: Единая система координат
+// - Стрелка указывает СВЕРХУ (на 12 часов)
+// - Первый сектор (index 0) должен быть СВЕРХУ в начальном положении
+// - conic-gradient from -90deg начинается сверху
+// - CSS rotate: положительное значение = по часовой стрелке
 function createWheel() {
     const wheel = document.getElementById('wheel');
-    const sectorAngle = 360 / prizes.length;
+    const sectorAngle = 360 / prizes.length; // 90° для 4 призов
 
-    // Создаем conic-gradient для фона колеса
-    // from 0deg = справа (3 часа), по часовой стрелке
-    let gradient = 'conic-gradient(from 0deg, ';
+    // Создаем conic-gradient: from -90deg означает начало СВЕРХУ
+    // Сектора идут по часовой стрелке: верх -> право -> низ -> лево
+    let gradient = 'conic-gradient(from -90deg, ';
     prizes.forEach((prize, index) => {
         const startAngle = sectorAngle * index;
         const endAngle = sectorAngle * (index + 1);
@@ -92,28 +97,31 @@ function createWheel() {
     gradient += ')';
     wheel.style.background = gradient;
 
-    // Добавляем текстовые метки для каждого сектора
-    // Градиент начинается с -90° (сверху), подписи должны совпадать
+    // Добавляем текстовые метки
+    // Позиции меток должны совпадать с секторами градиента
     prizes.forEach((prize, index) => {
         const label = document.createElement('div');
         label.className = 'wheel-label';
 
-        // Угол в центре сектора (0° = верх, по часовой стрелке)
-        const angle = sectorAngle * index + sectorAngle / 2;
-        // Для CSS: 0° = верх, 90° = право, поэтому angleRad без смещения
-        // Но CSS transform rotate использует 0° = право, поэтому -90°
-        const angleRad = (angle - 90) * (Math.PI / 180);
+        // Угол центра сектора относительно ВЕРХА (0° = верх, по часовой стрелке)
+        const angleDeg = sectorAngle * index + sectorAngle / 2;
+
+        // Для Math.cos/sin: 0° = право, поэтому вычитаем 90° чтобы 0° было сверху
+        const angleRad = (angleDeg - 90) * (Math.PI / 180);
 
         // Позиция метки (40% от центра к краю)
         const radius = 40;
         const x = 50 + radius * Math.cos(angleRad);
         const y = 50 + radius * Math.sin(angleRad);
 
+        // Поворот текста: +90° чтобы текст шёл от центра к краю
+        const textRotation = angleDeg;
+
         label.style.cssText = `
             position: absolute;
             left: ${x}%;
             top: ${y}%;
-            transform: translate(-50%, -50%) rotate(${angle}deg);
+            transform: translate(-50%, -50%) rotate(${textRotation}deg);
             font-size: 0.7rem;
             font-weight: 500;
             color: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '#000000' : '#FFFFFF'};
@@ -127,6 +135,15 @@ function createWheel() {
         label.textContent = prize.name;
 
         wheel.appendChild(label);
+    });
+
+    console.log('=== WHEEL CREATED ===');
+    console.log('Sectors (0° = top, clockwise):');
+    prizes.forEach((prize, index) => {
+        const start = sectorAngle * index;
+        const end = sectorAngle * (index + 1);
+        const center = start + sectorAngle / 2;
+        console.log(`  ${index}: ${prize.name} (${start}°-${end}°, center: ${center}°)`);
     });
 }
 
@@ -202,20 +219,26 @@ async function spinWheel() {
                 throw new Error('Приз не найден');
             }
 
-            // Расчёт угла
-            // conic-gradient начинается с 0° = справа (3 часа)
-            // Стрелка указывает на верх = -90° (или 270°) от начала градиента
-            // Сектор с центром X° должен оказаться на 270° (под стрелкой)
-            // targetAngle = 270 - sectorCenter (или -(sectorCenter - 270))
+            // Расчёт угла вращения
+            // Система координат: 0° = ВЕРХ, по часовой стрелке
+            // Стрелка указывает на ВЕРХ (0°)
+            // Сектор с центром на X° должен оказаться на 0° (под стрелкой)
+            // Для этого колесо должно повернуться на -X° (против часовой)
+            // или эквивалентно на (360 - X)° по часовой стрелке
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            // Нужно повернуть так, чтобы sectorCenter оказался на позиции 270° (верх)
-            const targetAngle = 270 - sectorCenter;
+
+            // Чтобы сектор с центром sectorCenter оказался под стрелкой (на 0°),
+            // поворачиваем колесо на -(sectorCenter) градусов
+            // Используем отрицательный угол, чтобы колесо крутилось против часовой
+            // и нужный сектор "приехал" к стрелке
+            const targetAngle = -sectorCenter;
 
             console.log('=== ANGLE CALCULATION ===');
             console.log('Prize:', prizes[prizeIndex].name);
-            console.log('Index:', prizeIndex, 'Sector angle:', sectorAngle);
-            console.log('Sector center:', sectorCenter, 'Target angle:', targetAngle);
+            console.log('Index:', prizeIndex);
+            console.log('Sector: from', sectorAngle * prizeIndex, 'to', sectorAngle * (prizeIndex + 1), 'center:', sectorCenter);
+            console.log('Target angle:', targetAngle, '(wheel rotates', targetAngle, 'degrees)');
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
