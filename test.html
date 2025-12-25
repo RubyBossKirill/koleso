@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест колеса</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 2s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            position: relative;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid red;
+            z-index: 10;
+        }
+        .wheel-label {
+            position: absolute;
+            font-size: 0.6rem;
+            font-weight: bold;
+            text-align: center;
+            width: 70px;
+            pointer-events: none;
+        }
+        .controls {
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .info {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align: left;
+        }
+        .correction {
+            margin: 20px;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Тест углов колеса</h2>
+
+    <div class="wheel-container">
+        <div class="wheel-pointer"></div>
+        <div class="wheel" id="wheel"></div>
+    </div>
+
+    <div class="controls">
+        <p>Выбери приз и нажми "Крутить":</p>
+        <button onclick="spinTo(0)">Приз 0: Скидка 20%</button>
+        <button onclick="spinTo(1)">Приз 1: Скидка 50%</button>
+        <button onclick="spinTo(2)">Приз 2: Скидка 10%</button>
+        <button onclick="spinTo(3)">Приз 3: Криосеанс</button>
+    </div>
+
+    <div class="correction">
+        <label>Коррекция угла: </label>
+        <input type="number" id="correction" value="0" step="45">
+        <span>градусов</span>
+    </div>
+
+    <div class="info" id="info">
+        <p>Нажми на кнопку приза чтобы проверить</p>
+    </div>
+
+    <script>
+        const prizes = [
+            { id: 1, name: "Скидка 20%", color: "#90482A" },
+            { id: 2, name: "Скидка 50%", color: "#AC802E" },
+            { id: 3, name: "Скидка 10%", color: "#FCF2AE" },
+            { id: 4, name: "Криосеанс", color: "#AAAAAA" }
+        ];
+
+        function createWheel() {
+            const wheel = document.getElementById('wheel');
+            const sectorAngle = 360 / prizes.length;
+
+            let gradient = 'conic-gradient(from 0deg, ';
+            prizes.forEach((prize, index) => {
+                const startAngle = sectorAngle * index;
+                const endAngle = sectorAngle * (index + 1);
+                gradient += `${prize.color} ${startAngle}deg ${endAngle}deg`;
+                if (index < prizes.length - 1) gradient += ', ';
+            });
+            gradient += ')';
+            wheel.style.background = gradient;
+
+            // Добавляем метки
+            prizes.forEach((prize, index) => {
+                const label = document.createElement('div');
+                label.className = 'wheel-label';
+
+                const angle = sectorAngle * index + sectorAngle / 2;
+                const angleRad = (angle - 90) * (Math.PI / 180);
+                const radius = 35;
+                const x = 50 + radius * Math.cos(angleRad);
+                const y = 50 + radius * Math.sin(angleRad);
+
+                label.style.left = x + '%';
+                label.style.top = y + '%';
+                label.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                label.style.color = (prize.color === '#FCF2AE' || prize.color === '#AAAAAA') ? '#000' : '#FFF';
+                label.textContent = prize.name;
+                wheel.appendChild(label);
+            });
+        }
+
+        let spinCount = 0;
+
+        function spinTo(prizeIndex) {
+            const wheel = document.getElementById('wheel');
+            const correction = parseInt(document.getElementById('correction').value) || 0;
+
+            const sectorAngle = 360 / prizes.length; // 90°
+            const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
+
+            // Базовая формула + коррекция
+            const targetAngle = -sectorCenter + correction;
+
+            spinCount++;
+            const spins = 3;
+            const finalAngle = spins * 360 + targetAngle;
+
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+            document.getElementById('info').innerHTML = `
+                <p><strong>Выбранный приз:</strong> ${prizes[prizeIndex].name} (index=${prizeIndex})</p>
+                <p><strong>Центр сектора:</strong> ${sectorCenter}°</p>
+                <p><strong>Target angle:</strong> ${targetAngle}°</p>
+                <p><strong>Final angle:</strong> ${finalAngle}°</p>
+                <p><strong>Коррекция:</strong> ${correction}°</p>
+                <hr>
+                <p>Если колесо остановилось НЕ на "${prizes[prizeIndex].name}",
+                   измени коррекцию и попробуй снова.</p>
+                <p>Когда найдёшь правильную коррекцию — скажи мне число!</p>
+            `;
+        }
+
+        createWheel();
+    </script>
+</body>
+</html>
