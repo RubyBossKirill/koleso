@@ -201,11 +201,12 @@ async function spinWheel() {
 
             // Расчёт угла
             // conic-gradient начинается с -90° (сверху, 12 часов)
-            // Стрелка тоже указывает на верх (12 часов)
-            // Чтобы центр сектора оказался под стрелкой: targetAngle = -sectorCenter
+            // Стрелка указывает на верх (0°)
+            // Сектор с центром X° должен оказаться на 0° (под стрелкой)
+            // Для этого колесо должно повернуться на (360 - X)° по часовой стрелке
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            const targetAngle = -sectorCenter;
+            const targetAngle = 360 - sectorCenter;
 
             console.log('=== ANGLE CALCULATION ===');
             console.log('Prize:', prizes[prizeIndex].name);
