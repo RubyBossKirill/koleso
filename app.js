@@ -287,6 +287,7 @@ async function closePrize() {
 
     // Отправляем информацию о выигрыше
     const data = {
+        type: "fortune",
         user: {
             platform_id: userData.id,
             firstName: userData.firstName,
