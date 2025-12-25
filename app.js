@@ -75,62 +75,6 @@ function initTelegram() {
     }
 }
 
-// Перестройка колеса так, чтобы выигранный приз был на первой позиции
-function rebuildWheelForPrize(winningIndex) {
-    const wheel = document.getElementById('wheel');
-    const sectorAngle = 360 / prizes.length;
-
-    // Создаём новый порядок: выигранный приз первый, остальные по порядку после него
-    const reorderedPrizes = [];
-    for (let i = 0; i < prizes.length; i++) {
-        reorderedPrizes.push(prizes[(winningIndex + i) % prizes.length]);
-    }
-
-    // Пересоздаём градиент с новым порядком
-    let gradient = 'conic-gradient(from 0deg, ';
-    reorderedPrizes.forEach((prize, index) => {
-        const startAngle = sectorAngle * index;
-        const endAngle = sectorAngle * (index + 1);
-        gradient += `${prize.color} ${startAngle}deg ${endAngle}deg`;
-        if (index < reorderedPrizes.length - 1) gradient += ', ';
-    });
-    gradient += ')';
-    wheel.style.background = gradient;
-
-    // Удаляем старые метки
-    wheel.querySelectorAll('.wheel-label').forEach(label => label.remove());
-
-    // Добавляем новые метки в новом порядке
-    reorderedPrizes.forEach((prize, index) => {
-        const label = document.createElement('div');
-        label.className = 'wheel-label';
-
-        const angle = sectorAngle * index + sectorAngle / 2;
-        const angleRad = (angle - 90) * (Math.PI / 180);
-        const radius = 40;
-        const x = 50 + radius * Math.cos(angleRad);
-        const y = 50 + radius * Math.sin(angleRad);
-
-        label.style.cssText = `
-            position: absolute;
-            left: ${x}%;
-            top: ${y}%;
-            transform: translate(-50%, -50%) rotate(${angle}deg);
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '#000000' : '#FFFFFF'};
-            text-align: center;
-            width: 80px;
-            line-height: 1.2;
-            text-shadow: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.5)'};
-            pointer-events: none;
-            letter-spacing: 0.5px;
-        `;
-        label.textContent = prize.name;
-        wheel.appendChild(label);
-    });
-}
-
 // Создание секторов колеса
 function createWheel() {
     const wheel = document.getElementById('wheel');
@@ -240,25 +184,23 @@ async function spinWheel() {
             const prizeIndex = prizes.findIndex(p => p.id === currentPrize.id);
             console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
-            // Перестраиваем колесо: выигранный приз будет на первой позиции (сверху)
-            // Сначала убираем анимацию, чтобы перестройка была мгновенной
-            wheel.style.transition = 'none';
-            wheel.style.transform = 'rotate(0deg)';
+            // Расчёт угла:
+            // conic-gradient идёт ПО часовой стрелке от 0° (верх)
+            // CSS rotate() тоже крутит ПО часовой стрелке
+            // Когда мы rotate(X), точка которая была на 0° уходит на X° по часовой
+            // Значит точка которая была на Y° окажется на 0° если rotate(360-Y) или rotate(-Y)
 
-            // Перестраиваем секторы
-            rebuildWheelForPrize(prizeIndex);
+            const sectorAngle = 360 / prizes.length; // 90°
+            const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
 
-            // Даём браузеру применить изменения
-            wheel.offsetHeight; // force reflow
+            // Нужно повернуть так, чтобы sectorCenter оказался вверху (на 0°)
+            // rotate(-sectorCenter) сделает это, но мы хотим положительный угол
+            // rotate(360 - sectorCenter) = rotate(-sectorCenter)
+            const targetAngle = -sectorCenter; // используем отрицательный угол напрямую
 
-            // Возвращаем анимацию и крутим
-            wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-
-            // Крутим на фиксированный угол - первый сектор окажется под стрелкой
-            // Стрелка вверху (0°), центр первого сектора на 45°, значит крутим на 360-45=315° + полные обороты
             const spins = 5 + Math.random() * 3;
-            const finalAngle = spins * 360 + 315;
-            console.log('Final angle:', finalAngle);
+            const finalAngle = spins * 360 + targetAngle;
+            console.log('Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
 
             wheel.style.transform = `rotate(${finalAngle}deg)`;
 
