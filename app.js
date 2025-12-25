@@ -184,23 +184,16 @@ async function spinWheel() {
             const prizeIndex = prizes.findIndex(p => p.id === currentPrize.id);
             console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
-            // Расчёт угла:
-            // conic-gradient идёт ПО часовой стрелке от 0° (верх)
-            // CSS rotate() тоже крутит ПО часовой стрелке
-            // Когда мы rotate(X), точка которая была на 0° уходит на X° по часовой
-            // Значит точка которая была на Y° окажется на 0° если rotate(360-Y) или rotate(-Y)
-
+            // Расчёт угла
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
 
-            // Нужно повернуть так, чтобы sectorCenter оказался вверху (на 0°)
-            // rotate(-sectorCenter) сделает это, но мы хотим положительный угол
-            // rotate(360 - sectorCenter) = rotate(-sectorCenter)
-            const targetAngle = -sectorCenter; // используем отрицательный угол напрямую
+            // Эмпирическая коррекция: визуально смещение на 180°
+            const targetAngle = -sectorCenter + 180;
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
-            console.log('Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
+            console.log('Prize index:', prizeIndex, 'Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
 
             wheel.style.transform = `rotate(${finalAngle}deg)`;
 
