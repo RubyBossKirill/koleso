@@ -282,7 +282,37 @@ function showNoPrizes() {
 }
 
 // Закрытие после получения приза
-function closePrize() {
+async function closePrize() {
+    const CLAIM_URL = 'https://n8n.altaitravel.net/webhook/29c58245-6516-4565-a0fe-5862d1e18d6b';
+
+    // Отправляем информацию о выигрыше
+    const data = {
+        user: {
+            platform_id: userData.id,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            username: userData.username
+        },
+        prize: {
+            id: currentPrize.id,
+            name: currentPrize.name,
+            description: currentPrize.description
+        },
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        await fetch(CLAIM_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        console.log('Prize claim sent:', data);
+    } catch (error) {
+        console.error('Error sending claim:', error);
+    }
+
+    // Закрываем WebApp
     if (tg) {
         tg.close();
     } else {
