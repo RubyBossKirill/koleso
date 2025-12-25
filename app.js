@@ -143,14 +143,6 @@ function createWheel() {
         wheel.appendChild(label);
     });
 
-    console.log('=== WHEEL CREATED ===');
-    console.log('Sectors (0° = top, clockwise):');
-    prizes.forEach((prize, index) => {
-        const start = sectorAngle * index;
-        const end = sectorAngle * (index + 1);
-        const center = start + sectorAngle / 2;
-        console.log(`  ${index}: ${prize.name} (${start}°-${end}°, center: ${center}°)`);
-    });
 }
 
 // Настройка обработчиков событий
@@ -207,51 +199,20 @@ async function spinWheel() {
             // Получили приз - крутим колесо
             currentPrize = result.prize;
 
-            // Детальное логирование ответа сервера
-            console.log('=== SERVER RESPONSE ===');
-            console.log('Full prize object:', JSON.stringify(currentPrize));
-            console.log('Prize ID from server:', currentPrize.id, 'Type:', typeof currentPrize.id);
-            console.log('Prize name from server:', currentPrize.name);
-            console.log('Local prizes:', prizes.map(p => ({id: p.id, name: p.name})));
-
-            // Находим индекс приза в массиве (приводим id к числу на всякий случай)
+            // Находим индекс приза в массиве
             const serverPrizeId = Number(currentPrize.id);
             const prizeIndex = prizes.findIndex(p => p.id === serverPrizeId);
-            console.log('Looking for ID:', serverPrizeId, 'Found index:', prizeIndex);
 
-            // Проверка что приз найден
             if (prizeIndex === -1) {
-                console.error('Prize not found in local array! Server ID:', serverPrizeId);
                 throw new Error('Приз не найден');
             }
 
             // Расчёт угла вращения
-            // Система координат: 0° = ВЕРХ, по часовой стрелке
-            // Стрелка указывает на ВЕРХ (0°)
-            //
-            // При повороте колеса на угол A по часовой стрелке,
-            // точка которая была на позиции X° окажется на позиции (X + A) mod 360°
-            //
-            // Чтобы центр сектора (на позиции sectorCenter) оказался на 0° (под стрелкой):
-            // (sectorCenter + A) mod 360 = 0
-            // A = -sectorCenter (или 360 - sectorCenter для положительного угла)
-
-            const sectorAngle = 360 / prizes.length; // 90°
+            const sectorAngle = 360 / prizes.length;
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-
-            // Угол поворота: (360 - sectorCenter) чтобы сектор приехал к стрелке
-            // Для 5-8 полных оборотов добавляем spins * 360
             const spins = 5 + Math.floor(Math.random() * 3);
-            const stopAngle = (360 - sectorCenter) % 360; // куда должно остановиться (0-360)
+            const stopAngle = (360 - sectorCenter) % 360;
             const finalAngle = spins * 360 + stopAngle;
-
-            console.log('=== ANGLE CALCULATION ===');
-            console.log('Prize:', prizes[prizeIndex].name);
-            console.log('Index:', prizeIndex);
-            console.log('Sector: from', sectorAngle * prizeIndex, 'to', sectorAngle * (prizeIndex + 1), 'center:', sectorCenter);
-            console.log('Stop angle:', stopAngle, '(where wheel stops after spins)');
-            console.log('Final angle:', finalAngle, '(', finalAngle, 'mod 360 =', finalAngle % 360, ')');
-            console.log('Verification: sector at', sectorCenter, '+ rotation', finalAngle % 360, '=', (sectorCenter + finalAngle) % 360, '(should be ~0)');
 
             // Сбрасываем колесо в начальное положение перед вращением
             wheel.style.transition = 'none';
