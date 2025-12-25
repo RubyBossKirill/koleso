@@ -81,7 +81,8 @@ function createWheel() {
     const sectorAngle = 360 / prizes.length;
 
     // Создаем conic-gradient для фона колеса
-    let gradient = 'conic-gradient(from 0deg, ';
+    // from -90deg чтобы градиент начинался сверху (12 часов), как и подписи
+    let gradient = 'conic-gradient(from -90deg, ';
     prizes.forEach((prize, index) => {
         const startAngle = sectorAngle * index;
         const endAngle = sectorAngle * (index + 1);
@@ -180,17 +181,36 @@ async function spinWheel() {
             // Получили приз - крутим колесо
             currentPrize = result.prize;
 
-            // Находим индекс приза в массиве
-            const prizeIndex = prizes.findIndex(p => p.id === currentPrize.id);
-            console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
+            // Детальное логирование ответа сервера
+            console.log('=== SERVER RESPONSE ===');
+            console.log('Full prize object:', JSON.stringify(currentPrize));
+            console.log('Prize ID from server:', currentPrize.id, 'Type:', typeof currentPrize.id);
+            console.log('Prize name from server:', currentPrize.name);
+            console.log('Local prizes:', prizes.map(p => ({id: p.id, name: p.name})));
+
+            // Находим индекс приза в массиве (приводим id к числу на всякий случай)
+            const serverPrizeId = Number(currentPrize.id);
+            const prizeIndex = prizes.findIndex(p => p.id === serverPrizeId);
+            console.log('Looking for ID:', serverPrizeId, 'Found index:', prizeIndex);
+
+            // Проверка что приз найден
+            if (prizeIndex === -1) {
+                console.error('Prize not found in local array! Server ID:', serverPrizeId);
+                throw new Error('Приз не найден');
+            }
 
             // Расчёт угла
-            // conic-gradient начинается с 0° = справа (3 часа) по часовой стрелке
-            // Стрелка указывает на верх (12 часов) = -90° от начала градиента
-            // Поэтому для позиции под стрелкой нужно: 90° - sectorCenter
+            // conic-gradient начинается с -90° (сверху, 12 часов)
+            // Стрелка тоже указывает на верх (12 часов)
+            // Чтобы центр сектора оказался под стрелкой: targetAngle = -sectorCenter
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            const targetAngle = 90 - sectorCenter;
+            const targetAngle = -sectorCenter;
+
+            console.log('=== ANGLE CALCULATION ===');
+            console.log('Prize:', prizes[prizeIndex].name);
+            console.log('Index:', prizeIndex, 'Sector angle:', sectorAngle);
+            console.log('Sector center:', sectorCenter, 'Target angle:', targetAngle);
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
