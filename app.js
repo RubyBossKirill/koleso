@@ -7,7 +7,7 @@ const prizes = [
     { id: 4, name: "Криосеанс", description: "Бесплатный разовый криосеанс", color: "#AAAAAA" }
 ];
 
-// URL API для получения приза
+// URL API (GET - проверка, POST - выдача приза)
 const API_URL = 'https://n8n.altaitravel.net/webhook/8ed5a0ec-1cd3-466e-923b-91a404dfa641';
 
 // Инициализация Telegram WebApp
@@ -182,14 +182,24 @@ async function spinWheel() {
 
             // Находим индекс приза в массиве
             const prizeIndex = prizes.findIndex(p => p.id === currentPrize.id);
+            console.log('Prize index:', prizeIndex, 'Prize:', currentPrize);
 
             // Вычисляем угол для остановки на выбранном призе
-            const sectorAngle = 360 / prizes.length;
-            const prizeAngle = sectorAngle * prizeIndex;
+            // conic-gradient(from 0deg) начинается сверху и идёт по часовой стрелке
+            // Стрелка указывает вверх
+            const sectorAngle = 360 / prizes.length; // 90° на сектор
 
-            // Добавляем несколько полных оборотов + угол до приза
+            // Центр нужного сектора
+            const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
+
+            // Чтобы сектор оказался под стрелкой (вверху), нужно повернуть колесо
+            // на угол = -(sectorCenter) или 360 - sectorCenter
+            const targetAngle = 360 - sectorCenter;
+
+            // Добавляем несколько полных оборотов
             const spins = 5 + Math.random() * 3; // 5-8 полных оборотов
-            const finalAngle = spins * 360 + (360 - prizeAngle - sectorAngle / 2);
+            const finalAngle = spins * 360 + targetAngle;
+            console.log('Sector angle:', sectorAngle, 'Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
 
             wheel.style.transform = `rotate(${finalAngle}deg)`;
 
@@ -283,8 +293,31 @@ function closePrize() {
 
 // Проверка статуса пользователя при загрузке
 async function checkUserStatus() {
-    // Проверка происходит при попытке крутить - сервер сам проверит
-    // Здесь можно добавить предварительную проверку если нужно
+    // Если нет userId - не проверяем
+    if (!userData.id) return;
+
+    try {
+        // GET запрос для проверки статуса (без выдачи приза)
+        const response = await fetch(`${API_URL}?userId=${userData.id}`, {
+            method: 'GET'
+        });
+
+        const result = await response.json();
+        console.log('Check status response:', result);
+
+        if (result.status === 'already_played' && result.prize) {
+            // Пользователь уже играл - показываем его приз
+            showAlreadyPlayed(result.prize);
+        } else if (result.status === 'no_prizes_left') {
+            // Призы закончились
+            showNoPrizes();
+        }
+        // Если can_play - ничего не делаем, пользователь может крутить
+
+    } catch (error) {
+        console.error('Check status error:', error);
+        // При ошибке просто даём крутить
+    }
 }
 
 // Создание конфетти с цветами брендбука
