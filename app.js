@@ -99,22 +99,28 @@ function createWheel() {
 
     // Добавляем текстовые метки
     // Позиции меток должны совпадать с секторами градиента
+    // Градиент from -90deg: 0° в градиенте = верх на экране
     prizes.forEach((prize, index) => {
         const label = document.createElement('div');
         label.className = 'wheel-label';
 
-        // Угол центра сектора относительно ВЕРХА (0° = верх, по часовой стрелке)
+        // Угол центра сектора (0° = верх, по часовой стрелке)
         const angleDeg = sectorAngle * index + sectorAngle / 2;
 
-        // Для Math.cos/sin: 0° = право, поэтому вычитаем 90° чтобы 0° было сверху
-        const angleRad = (angleDeg - 90) * (Math.PI / 180);
+        // Конвертация в CSS/Math координаты:
+        // В CSS/Math: 0° = право (3 часа)
+        // Наша система: 0° = верх (12 часов)
+        // Разница: -90° (или +270°)
+        // CSS угол = наш угол - 90°
+        const cssAngle = angleDeg - 90;
+        const angleRad = cssAngle * (Math.PI / 180);
 
         // Позиция метки (40% от центра к краю)
         const radius = 40;
         const x = 50 + radius * Math.cos(angleRad);
         const y = 50 + radius * Math.sin(angleRad);
 
-        // Поворот текста: +90° чтобы текст шёл от центра к краю
+        // Поворот текста для читаемости (текст идёт от центра наружу)
         const textRotation = angleDeg;
 
         label.style.cssText = `
@@ -222,27 +228,30 @@ async function spinWheel() {
             // Расчёт угла вращения
             // Система координат: 0° = ВЕРХ, по часовой стрелке
             // Стрелка указывает на ВЕРХ (0°)
-            // Сектор с центром на X° должен оказаться на 0° (под стрелкой)
-            // Для этого колесо должно повернуться на -X° (против часовой)
-            // или эквивалентно на (360 - X)° по часовой стрелке
+            //
+            // При повороте колеса на угол A по часовой стрелке,
+            // точка которая была на позиции X° окажется на позиции (X + A) mod 360°
+            //
+            // Чтобы центр сектора (на позиции sectorCenter) оказался на 0° (под стрелкой):
+            // (sectorCenter + A) mod 360 = 0
+            // A = -sectorCenter (или 360 - sectorCenter для положительного угла)
+
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
 
-            // Чтобы сектор с центром sectorCenter оказался под стрелкой (на 0°),
-            // поворачиваем колесо на -(sectorCenter) градусов
-            // Используем отрицательный угол, чтобы колесо крутилось против часовой
-            // и нужный сектор "приехал" к стрелке
-            const targetAngle = -sectorCenter;
+            // Угол поворота: (360 - sectorCenter) чтобы сектор приехал к стрелке
+            // Для 5-8 полных оборотов добавляем spins * 360
+            const spins = 5 + Math.floor(Math.random() * 3);
+            const stopAngle = (360 - sectorCenter) % 360; // куда должно остановиться (0-360)
+            const finalAngle = spins * 360 + stopAngle;
 
             console.log('=== ANGLE CALCULATION ===');
             console.log('Prize:', prizes[prizeIndex].name);
             console.log('Index:', prizeIndex);
             console.log('Sector: from', sectorAngle * prizeIndex, 'to', sectorAngle * (prizeIndex + 1), 'center:', sectorCenter);
-            console.log('Target angle:', targetAngle, '(wheel rotates', targetAngle, 'degrees)');
-
-            const spins = 5 + Math.random() * 3;
-            const finalAngle = spins * 360 + targetAngle;
-            console.log('Prize index:', prizeIndex, 'Sector center:', sectorCenter, 'Target:', targetAngle, 'Final:', finalAngle);
+            console.log('Stop angle:', stopAngle, '(where wheel stops after spins)');
+            console.log('Final angle:', finalAngle, '(', finalAngle, 'mod 360 =', finalAngle % 360, ')');
+            console.log('Verification: sector at', sectorCenter, '+ rotation', finalAngle % 360, '=', (sectorCenter + finalAngle) % 360, '(should be ~0)');
 
             // Сбрасываем колесо в начальное положение перед вращением
             wheel.style.transition = 'none';
