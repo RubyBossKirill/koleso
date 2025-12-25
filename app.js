@@ -81,8 +81,8 @@ function createWheel() {
     const sectorAngle = 360 / prizes.length;
 
     // Создаем conic-gradient для фона колеса
-    // from -90deg чтобы градиент начинался сверху (12 часов), как и подписи
-    let gradient = 'conic-gradient(from -90deg, ';
+    // from 0deg = справа (3 часа), по часовой стрелке
+    let gradient = 'conic-gradient(from 0deg, ';
     prizes.forEach((prize, index) => {
         const startAngle = sectorAngle * index;
         const endAngle = sectorAngle * (index + 1);
@@ -93,16 +93,19 @@ function createWheel() {
     wheel.style.background = gradient;
 
     // Добавляем текстовые метки для каждого сектора
+    // Градиент начинается с -90° (сверху), подписи должны совпадать
     prizes.forEach((prize, index) => {
         const label = document.createElement('div');
         label.className = 'wheel-label';
 
-        // Угол в центре сектора
+        // Угол в центре сектора (0° = верх, по часовой стрелке)
         const angle = sectorAngle * index + sectorAngle / 2;
+        // Для CSS: 0° = верх, 90° = право, поэтому angleRad без смещения
+        // Но CSS transform rotate использует 0° = право, поэтому -90°
         const angleRad = (angle - 90) * (Math.PI / 180);
 
-        // Позиция метки (70% от центра к краю)
-        const radius = 40; // процент от центра
+        // Позиция метки (40% от центра к краю)
+        const radius = 40;
         const x = 50 + radius * Math.cos(angleRad);
         const y = 50 + radius * Math.sin(angleRad);
 
@@ -200,13 +203,14 @@ async function spinWheel() {
             }
 
             // Расчёт угла
-            // conic-gradient начинается с -90° (сверху, 12 часов)
-            // Стрелка указывает на верх (0°)
-            // Сектор с центром X° должен оказаться на 0° (под стрелкой)
-            // Для этого колесо должно повернуться на (360 - X)° по часовой стрелке
+            // conic-gradient начинается с 0° = справа (3 часа)
+            // Стрелка указывает на верх = -90° (или 270°) от начала градиента
+            // Сектор с центром X° должен оказаться на 270° (под стрелкой)
+            // targetAngle = 270 - sectorCenter (или -(sectorCenter - 270))
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            const targetAngle = 360 - sectorCenter;
+            // Нужно повернуть так, чтобы sectorCenter оказался на позиции 270° (верх)
+            const targetAngle = 270 - sectorCenter;
 
             console.log('=== ANGLE CALCULATION ===');
             console.log('Prize:', prizes[prizeIndex].name);
