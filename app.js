@@ -187,7 +187,8 @@ async function spinWheel() {
             // Расчёт угла
             const sectorAngle = 360 / prizes.length; // 90°
             const sectorCenter = sectorAngle * prizeIndex + sectorAngle / 2;
-            const targetAngle = -sectorCenter;
+            // Коррекция +90° для основного приложения (эмпирически подобрано)
+            const targetAngle = -sectorCenter + 90;
 
             const spins = 5 + Math.random() * 3;
             const finalAngle = spins * 360 + targetAngle;
