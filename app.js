@@ -98,8 +98,6 @@ function createWheel() {
     wheel.style.background = gradient;
 
     // Добавляем текстовые метки
-    // Позиции меток должны совпадать с секторами градиента
-    // Градиент from -90deg: 0° в градиенте = верх на экране
     prizes.forEach((prize, index) => {
         const label = document.createElement('div');
         label.className = 'wheel-label';
@@ -107,21 +105,21 @@ function createWheel() {
         // Угол центра сектора (0° = верх, по часовой стрелке)
         const angleDeg = sectorAngle * index + sectorAngle / 2;
 
-        // Конвертация в CSS/Math координаты:
-        // В CSS/Math: 0° = право (3 часа)
-        // Наша система: 0° = верх (12 часов)
-        // Разница: -90° (или +270°)
-        // CSS угол = наш угол - 90°
+        // Конвертация для позиционирования
         const cssAngle = angleDeg - 90;
         const angleRad = cssAngle * (Math.PI / 180);
 
-        // Позиция метки (40% от центра к краю)
+        // Позиция метки
         const radius = 40;
         const x = 50 + radius * Math.cos(angleRad);
         const y = 50 + radius * Math.sin(angleRad);
 
-        // Поворот текста для читаемости (текст идёт от центра наружу)
-        const textRotation = angleDeg;
+        // Поворот текста: если сектор в нижней половине (90°-270°), переворачиваем текст
+        // чтобы он читался правильно
+        let textRotation = angleDeg;
+        if (angleDeg > 90 && angleDeg < 270) {
+            textRotation = angleDeg + 180; // переворачиваем
+        }
 
         label.style.cssText = `
             position: absolute;
