@@ -1,27 +1,74 @@
-// Призы для колеса - цвета по брендбуку ALTAY RESTART
-// Теперь только 4 приза согласно лимитам
-const prizes = [
-    { id: 1, name: "Скидка 20% на проживание", description: "Скидка 20% на следующее проживание от 5 суток", color: "#90482A" },
-    { id: 2, name: "Скидка 50% ресторан", description: "Скидка 50% на меню ресторана без алкоголя", color: "#AC802E" },
-    { id: 3, name: "Скидка 10% ресторан", description: "Скидка 10% на меню ресторана без алкоголя", color: "#FCF2AE" },
-    { id: 4, name: "Криосеанс", description: "Бесплатный разовый криосеанс", color: "#AAAAAA" }
-];
+// Призы загружаются с сервера
+let prizes = [];
 
-// URL API (GET - проверка, POST - выдача приза)
+// Цвета для секторов по брендбуку ALTAY RESTART
+const SECTOR_COLORS = ['#90482A', '#AC802E', '#FCF2AE', '#AAAAAA'];
+
+// URL API
 const API_URL = 'https://n8n.altaitravel.net/webhook/8ed5a0ec-1cd3-466e-923b-91a404dfa641';
+const PRIZES_URL = 'https://n8n.altaitravel.net/webhook/d517b799-70fd-4632-ac18-f2ec973913cd';
 
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
 let userData = null;
 
 // Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initTelegram();
+    await loadPrizes();
     createWheel();
     setupEventListeners();
     checkUserStatus();
     createSnowflakes();
 });
+
+// Загрузка призов с сервера
+async function loadPrizes() {
+    try {
+        const response = await fetch(PRIZES_URL);
+        const data = await response.json();
+
+        console.log('Prizes from server:', data);
+
+        // Если сервер вернул массив призов
+        if (Array.isArray(data) && data.length > 0) {
+            prizes = data.map((prize, index) => ({
+                id: prize.id,
+                name: prize.name,
+                description: prize.description || prize.name,
+                color: prize.color || SECTOR_COLORS[index % SECTOR_COLORS.length]
+            }));
+        } else if (data.prizes && Array.isArray(data.prizes)) {
+            // Если призы в поле prizes
+            prizes = data.prizes.map((prize, index) => ({
+                id: prize.id,
+                name: prize.name,
+                description: prize.description || prize.name,
+                color: prize.color || SECTOR_COLORS[index % SECTOR_COLORS.length]
+            }));
+        } else {
+            // Fallback на локальные призы
+            console.warn('Не удалось загрузить призы с сервера, используем локальные');
+            prizes = [
+                { id: 1, name: "Скидка 20% на проживание", description: "Скидка 20% на следующее проживание от 5 суток", color: "#90482A" },
+                { id: 2, name: "Скидка 50% ресторан", description: "Скидка 50% на меню ресторана без алкоголя", color: "#AC802E" },
+                { id: 3, name: "Скидка 10% ресторан", description: "Скидка 10% на меню ресторана без алкоголя", color: "#FCF2AE" },
+                { id: 4, name: "Криосеанс", description: "Бесплатный разовый криосеанс", color: "#AAAAAA" }
+            ];
+        }
+
+        console.log('Loaded prizes:', prizes);
+    } catch (error) {
+        console.error('Ошибка загрузки призов:', error);
+        // Fallback на локальные призы
+        prizes = [
+            { id: 1, name: "Скидка 20% на проживание", description: "Скидка 20% на следующее проживание от 5 суток", color: "#90482A" },
+            { id: 2, name: "Скидка 50% ресторан", description: "Скидка 50% на меню ресторана без алкоголя", color: "#AC802E" },
+            { id: 3, name: "Скидка 10% ресторан", description: "Скидка 10% на меню ресторана без алкоголя", color: "#FCF2AE" },
+            { id: 4, name: "Криосеанс", description: "Бесплатный разовый криосеанс", color: "#AAAAAA" }
+        ];
+    }
+}
 
 // Создание новогодних снежинок
 function createSnowflakes() {

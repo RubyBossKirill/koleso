@@ -121,7 +121,7 @@ body::before {
 }
 
 .subtitle::after {
-    content: '🎄 С Новым Годом! 🎄';
+    content: '🎄 С Новым годом! 🎄';
     display: block;
     margin-top: 8px;
     margin-bottom: 40px;
