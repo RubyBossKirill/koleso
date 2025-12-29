@@ -127,12 +127,12 @@ function createWheel() {
             top: ${y}%;
             transform: translate(-50%, -50%) rotate(${textRotation}deg);
             font-size: 0.7rem;
-            font-weight: 500;
-            color: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '#000000' : '#FFFFFF'};
+            font-weight: 600;
+            color: #000000;
             text-align: center;
             width: 80px;
             line-height: 1.2;
-            text-shadow: ${prize.color === '#FCF2AE' || prize.color === '#AAAAAA' ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.5)'};
+            text-shadow: 0 0 8px rgba(255,255,255,0.5), 0 0 3px rgba(255,255,255,0.3);
             pointer-events: none;
             letter-spacing: 0.5px;
         `;
