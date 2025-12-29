@@ -43,26 +43,28 @@ function createSnowflakes() {
 
 // Инициализация Telegram
 function initTelegram() {
-    if (tg) {
+    if (tg && tg.initDataUnsafe?.user?.id) {
+        // Запуск внутри Telegram с валидными данными пользователя
         tg.ready();
         tg.expand();
 
-        // Получаем данные пользователя
         userData = {
-            id: tg.initDataUnsafe?.user?.id || null,
-            firstName: tg.initDataUnsafe?.user?.first_name || 'Гость',
-            lastName: tg.initDataUnsafe?.user?.last_name || '',
-            username: tg.initDataUnsafe?.user?.username || null,
-            languageCode: tg.initDataUnsafe?.user?.language_code || 'ru',
+            id: tg.initDataUnsafe.user.id,
+            firstName: tg.initDataUnsafe.user.first_name || 'Гость',
+            lastName: tg.initDataUnsafe.user.last_name || '',
+            username: tg.initDataUnsafe.user.username || null,
+            languageCode: tg.initDataUnsafe.user.language_code || 'ru',
             initData: tg.initData || null
         };
 
-        console.log('Telegram user:', userData);
-
-        // Устанавливаем цвета темы
         document.body.style.backgroundColor = tg.backgroundColor || '#1a1a2e';
     } else {
-        // Для тестирования вне Telegram - числовой ID
+        // Тестовый режим (вне Telegram или без данных пользователя)
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
         userData = {
             id: Math.floor(Math.random() * 900000000) + 100000000,
             firstName: 'Тестовый',
@@ -71,7 +73,6 @@ function initTelegram() {
             languageCode: 'ru',
             initData: null
         };
-        console.log('Running outside Telegram, test mode. User ID:', userData.id);
     }
 }
 
