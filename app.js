@@ -43,28 +43,40 @@ function createSnowflakes() {
 
 // Инициализация Telegram
 function initTelegram() {
-    if (tg && tg.initDataUnsafe?.user?.id) {
-        // Запуск внутри Telegram с валидными данными пользователя
+    console.log('=== TELEGRAM INIT ===');
+    console.log('tg object:', tg);
+    console.log('tg.initData:', tg?.initData);
+    console.log('tg.initDataUnsafe:', tg?.initDataUnsafe);
+    console.log('tg.initDataUnsafe.user:', tg?.initDataUnsafe?.user);
+
+    if (tg) {
         tg.ready();
         tg.expand();
 
-        userData = {
-            id: tg.initDataUnsafe.user.id,
-            firstName: tg.initDataUnsafe.user.first_name || 'Гость',
-            lastName: tg.initDataUnsafe.user.last_name || '',
-            username: tg.initDataUnsafe.user.username || null,
-            languageCode: tg.initDataUnsafe.user.language_code || 'ru',
-            initData: tg.initData || null
-        };
+        // Проверяем есть ли данные пользователя
+        if (tg.initDataUnsafe?.user?.id) {
+            userData = {
+                id: tg.initDataUnsafe.user.id,
+                firstName: tg.initDataUnsafe.user.first_name || 'Гость',
+                lastName: tg.initDataUnsafe.user.last_name || '',
+                username: tg.initDataUnsafe.user.username || null,
+                languageCode: tg.initDataUnsafe.user.language_code || 'ru',
+                initData: tg.initData || null
+            };
+            console.log('Telegram user loaded:', userData);
+        } else {
+            // Telegram WebApp есть, но данных пользователя нет
+            console.error('Telegram WebApp открыт, но данные пользователя недоступны!');
+            console.error('Убедитесь что WebApp открыт через кнопку бота, а не напрямую');
+
+            // Показываем ошибку пользователю
+            alert('Ошибка: не удалось получить данные пользователя. Откройте приложение через бота.');
+            return;
+        }
 
         document.body.style.backgroundColor = tg.backgroundColor || '#1a1a2e';
     } else {
-        // Тестовый режим (вне Telegram или без данных пользователя)
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
-
+        // Вне Telegram - тестовый режим
         userData = {
             id: Math.floor(Math.random() * 900000000) + 100000000,
             firstName: 'Тестовый',
@@ -73,6 +85,7 @@ function initTelegram() {
             languageCode: 'ru',
             initData: null
         };
+        console.log('Test mode, user:', userData);
     }
 }
 
