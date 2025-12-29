@@ -171,7 +171,7 @@ function createWheel() {
         const angleRad = cssAngle * (Math.PI / 180);
 
         // Позиция метки
-        const radius = 40;
+        const radius = 32;
         const x = 50 + radius * Math.cos(angleRad);
         const y = 50 + radius * Math.sin(angleRad);
 
@@ -187,17 +187,21 @@ function createWheel() {
             left: ${x}%;
             top: ${y}%;
             transform: translate(-50%, -50%) rotate(${textRotation}deg);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: #000000;
             text-align: center;
-            width: 80px;
+            width: 100px;
             line-height: 1.2;
             text-shadow: 0 0 8px rgba(255,255,255,0.5), 0 0 3px rgba(255,255,255,0.3);
             pointer-events: none;
             letter-spacing: 0.5px;
         `;
-        label.textContent = prize.name;
+        // Заменяем <br> и \n на перенос строки
+        console.log('Prize name raw:', JSON.stringify(prize.name));
+        let displayName = prize.name.replace(/<br\s*\/?>/gi, '<br>');
+        console.log('Prize name display:', displayName);
+        label.innerHTML = displayName;
 
         wheel.appendChild(label);
     });
