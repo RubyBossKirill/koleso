@@ -331,16 +331,57 @@ function showAlreadyPlayed(prize) {
 
     if (prize) {
         prizeText.innerHTML = `Ты уже выиграл:<br><strong>${prize.description}</strong>`;
+        activateBtn.textContent = 'Забрать подарок';
+        activateBtn.onclick = () => claimExistingPrize(prize);
     } else {
         prizeText.innerHTML = 'Ты уже участвовал в розыгрыше!<br><strong>Одна попытка на пользователя</strong>';
+        activateBtn.textContent = 'Закрыть';
+        activateBtn.onclick = () => {
+            if (tg) tg.close();
+            else modal.classList.remove('show');
+        };
+    }
+    modal.classList.add('show');
+}
+
+// Забрать уже выигранный приз (повторный заход)
+async function claimExistingPrize(prize) {
+    const CLAIM_URL = 'https://n8n.altaitravel.net/webhook/29c58245-6516-4565-a0fe-5862d1e18d6b';
+
+    const data = {
+        type: "fortune_repeat",
+        user: {
+            platform_id: userData.id,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            username: userData.username
+        },
+        prize: {
+            id: prize.id,
+            name: prize.name,
+            description: prize.description
+        },
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        await fetch(CLAIM_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        console.log('Repeat claim sent:', data);
+    } catch (error) {
+        console.error('Error sending repeat claim:', error);
     }
 
-    activateBtn.textContent = 'Закрыть';
-    activateBtn.onclick = () => {
-        if (tg) tg.close();
-        else modal.classList.remove('show');
-    };
-    modal.classList.add('show');
+    if (tg) {
+        tg.close();
+    } else {
+        console.log('Prize claimed again (test mode):', prize);
+        alert('Подарок получен!\n\n' + prize.description);
+        document.getElementById('resultModal').classList.remove('show');
+    }
 }
 
 // Показ сообщения "призы закончились"
